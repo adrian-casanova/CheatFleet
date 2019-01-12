@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Typography } from "@material-ui/core";
+import { Spring } from "react-spring";
 import { primaryBlue } from "../../styles";
 import SearchBar from "./components/SearchBar";
 
@@ -25,7 +26,8 @@ class WelcomePage extends Component {
     super(props);
     this.state = {
       containerHeight: window.innerHeight,
-      containerWidth: window.innerWidth
+      containerWidth: window.innerWidth,
+      searchValue: ""
     };
   }
 
@@ -41,31 +43,56 @@ class WelcomePage extends Component {
     });
   };
 
+  handleSearchTextChange = ({ target }) => {
+    this.setState({
+      searchValue: target.value
+    });
+  };
+
+  handleClearText = () => {
+    this.setState({
+      searchValue: ""
+    });
+  };
+
   render() {
-    const { containerHeight, containerWidth } = this.state;
+    const { containerHeight, containerWidth, searchValue } = this.state;
     return (
-      <div
-        style={{
-          height: containerHeight,
-          width: containerWidth,
-          backgroundImage: `linear-gradient(${primaryBlue}, #fff)`,
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center"
-        }}
+      <Spring
+        config={{ duration: 1500 }}
+        from={{ opacity: 0 }}
+        to={{ opacity: 1 }}
       >
-        <Typography variant="display3" style={styles.title}>
-          CheatFleet
-        </Typography>
-        <Typography style={styles.subheading} variant="subheading">
-          Unite with classmates to find a better future...
-        </Typography>
-        <SearchBar />
-        <Typography style={styles.footer} variant="caption">
-          CheatFleet 2019. all rights reserved.
-        </Typography>
-      </div>
+        {props => (
+          <div
+            style={{
+              height: containerHeight,
+              width: containerWidth,
+              backgroundImage: `linear-gradient(${primaryBlue}, #fff)`,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+              ...props
+            }}
+          >
+            <Typography variant="display3" style={styles.title}>
+              CheatFleet
+            </Typography>
+            <Typography style={styles.subheading} variant="subheading">
+              Unite with classmates to find a better future...
+            </Typography>
+            <SearchBar
+              searchValue={searchValue}
+              handleSearchTextChange={this.handleSearchTextChange}
+              handleClearText={this.handleClearText}
+            />
+            <Typography style={styles.footer} variant="caption">
+              CheatFleet 2019. all rights reserved.
+            </Typography>
+          </div>
+        )}
+      </Spring>
     );
   }
 }

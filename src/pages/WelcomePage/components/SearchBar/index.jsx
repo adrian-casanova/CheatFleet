@@ -1,6 +1,6 @@
 import React from "react";
 import { Typography, TextField, InputAdornment } from "@material-ui/core";
-import { Search } from "@material-ui/icons/";
+import { Search, CloseRounded } from "@material-ui/icons/";
 
 const styles = {
   container: {
@@ -16,18 +16,33 @@ const styles = {
     justifyContent: "center",
     paddingLeft: 20,
     paddingRight: 20
+  },
+  clearButton: {
+    cursor: "pointer"
   }
 };
 class SearchBar extends React.Component {
   render() {
+    const { searchValue, handleSearchTextChange, handleClearText } = this.props;
     return (
       <TextField
+        value={searchValue}
+        onChange={handleSearchTextChange}
+        placeholder="Enter your school"
         InputProps={{
           disableUnderline: true,
           style: { color: "darkgray" },
           startAdornment: (
             <InputAdornment position="start">
               <Search />
+            </InputAdornment>
+          ),
+          endAdornment: searchValue && (
+            <InputAdornment position="end">
+              <CloseRounded
+                style={styles.clearButton}
+                onClick={handleClearText}
+              />
             </InputAdornment>
           )
         }}
