@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Typography } from "@material-ui/core";
+import { Typography, Button } from "@material-ui/core";
 import { Spring } from "react-spring";
 import { primaryBlue } from "../../styles";
 import SearchBar from "./components/SearchBar";
@@ -19,6 +19,15 @@ const styles = {
     right: "0%",
     whiteSpace: "nowrap",
     fontStyle: "italic"
+  },
+  loginButton: {
+    position: "absolute",
+    top: "1%",
+    right: "1%",
+    borderColor: "white"
+  },
+  loginText: {
+    color: "white"
   }
 };
 class WelcomePage extends Component {
@@ -76,6 +85,9 @@ class WelcomePage extends Component {
               ...props
             }}
           >
+            <Button variant="outlined" style={styles.loginButton}>
+              <Typography style={styles.loginText}>Log In</Typography>
+            </Button>
             <Typography variant="display3" style={styles.title}>
               CheatFleet
             </Typography>
