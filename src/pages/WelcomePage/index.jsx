@@ -28,8 +28,16 @@ const styles = {
   },
   loginText: {
     color: "white"
+  },
+  logoLetter: {
+    position: "absolute",
+    top: "1%",
+    left: "1%",
+    height: 40,
+    width: 40
   }
 };
+const logoLetter = require("../../assets/logoLetter.png");
 class WelcomePage extends Component {
   constructor(props) {
     super(props);
@@ -102,6 +110,7 @@ class WelcomePage extends Component {
             <Typography style={styles.footer} variant="caption">
               CheatFleet 2019. all rights reserved.
             </Typography>
+            <img src={logoLetter} alt="CheatFleet" style={styles.logoLetter} />
           </div>
         )}
       </Spring>
