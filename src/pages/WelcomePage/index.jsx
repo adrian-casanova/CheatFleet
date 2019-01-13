@@ -3,6 +3,8 @@ import { Typography, Button } from "@material-ui/core";
 import { Spring } from "react-spring";
 import { primaryBlue } from "../../styles";
 import SearchBar from "./components/SearchBar";
+import Suggestions from "./components/Suggestions";
+import { schools } from "../../datasets/colleges";
 
 const styles = {
   title: {
@@ -44,7 +46,8 @@ class WelcomePage extends Component {
     this.state = {
       containerHeight: window.innerHeight,
       containerWidth: window.innerWidth,
-      searchValue: ""
+      searchValue: "",
+      suggestions: []
     };
   }
 
@@ -61,8 +64,10 @@ class WelcomePage extends Component {
   };
 
   handleSearchTextChange = ({ target }) => {
+    const suggestions = this.getSuggestions(target.value);
     this.setState({
-      searchValue: target.value
+      searchValue: target.value,
+      suggestions
     });
   };
 
@@ -72,8 +77,33 @@ class WelcomePage extends Component {
     });
   };
 
+  getSuggestions = value => {
+    const inputValue = value.trim().toLowerCase();
+    const inputLength = inputValue.length;
+    let count = 0;
+
+    return inputLength === 0
+      ? []
+      : schools.filter(item => {
+          const keep =
+            count < 5 &&
+            item.institution.slice(0, inputLength).toLowerCase() === inputValue;
+
+          if (keep) {
+            count += 1;
+          }
+
+          return keep;
+        });
+  };
+
   render() {
-    const { containerHeight, containerWidth, searchValue } = this.state;
+    const {
+      containerHeight,
+      containerWidth,
+      searchValue,
+      suggestions
+    } = this.state;
     return (
       <Spring
         config={{ duration: 1500 }}
@@ -107,6 +137,7 @@ class WelcomePage extends Component {
               handleSearchTextChange={this.handleSearchTextChange}
               handleClearText={this.handleClearText}
             />
+            <Suggestions suggestions={suggestions} />
             <Typography style={styles.footer} variant="caption">
               CheatFleet 2019. all rights reserved.
             </Typography>

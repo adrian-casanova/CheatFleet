@@ -26,6 +26,7 @@ class SearchBar extends React.Component {
     const { searchValue, handleSearchTextChange, handleClearText } = this.props;
     return (
       <TextField
+        autoComplete="off"
         value={searchValue}
         onChange={handleSearchTextChange}
         placeholder="Enter your school"
