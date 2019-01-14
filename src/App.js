@@ -1,10 +1,30 @@
-import React, { Component } from 'react';
-import AppRouter from './AppRouter';
+import React, { Component } from "react";
+import { createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles";
+import AppRouter from "./AppRouter";
+import { primaryBlue } from "./styles";
+import firebase from "firebase";
 
+const config = {
+  apiKey: "AIzaSyBCUiIsgkraGyEb_L6J96nYXObFtu6mD2k",
+  authDomain: "cheatfleet-14626.firebaseapp.com",
+  databaseURL: "https://cheatfleet-14626.firebaseio.com",
+  projectId: "cheatfleet-14626",
+  storageBucket: "cheatfleet-14626.appspot.com",
+  messagingSenderId: "766909737735"
+};
+firebase.initializeApp(config);
+const theme = createMuiTheme({
+  palette: {
+    primary: primaryBlue[500],
+    secondary: primaryBlue[500]
+  }
+});
 class App extends Component {
   render() {
     return (
-      <AppRouter />
+      <MuiThemeProvider theme={theme}>
+        <AppRouter />
+      </MuiThemeProvider>
     );
   }
 }

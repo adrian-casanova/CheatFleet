@@ -1,1 +1,1 @@
-export const primaryBlue = "#7BD0F7";
+export const primaryBlue = "#63c7f6";

@@ -8,6 +8,7 @@ const styles = {
     maxWidth: 750,
     alignSelf: "center",
     height: 50,
+    minHeight: 50,
     backgroundColor: "white",
     borderRadius: 25,
     marginTop: 10,

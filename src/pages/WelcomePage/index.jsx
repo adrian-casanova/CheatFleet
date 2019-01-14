@@ -56,7 +56,6 @@ class WelcomePage extends Component {
   }
 
   resizeCanvas = () => {
-    console.log("resizing");
     this.setState({
       containerHeight: window.innerHeight,
       containerWidth: window.innerWidth
@@ -73,7 +72,8 @@ class WelcomePage extends Component {
 
   handleClearText = () => {
     this.setState({
-      searchValue: ""
+      searchValue: "",
+      suggestions: []
     });
   };
 
@@ -97,6 +97,19 @@ class WelcomePage extends Component {
         });
   };
 
+  handleLoginClick = () => {
+    this.props.history.push("/login");
+  };
+
+  handleSchoolClick = value => {
+    this.props.history.push({
+      pathname: "/signup",
+      state: {
+        schoolName: value
+      }
+    });
+  };
+
   render() {
     const {
       containerHeight,
@@ -106,7 +119,7 @@ class WelcomePage extends Component {
     } = this.state;
     return (
       <Spring
-        config={{ duration: 1500 }}
+        // config={{ duration: 1000 }}
         from={{ opacity: 0 }}
         to={{ opacity: 1 }}
       >
@@ -123,21 +136,28 @@ class WelcomePage extends Component {
               ...props
             }}
           >
-            <Button variant="outlined" style={styles.loginButton}>
+            <Button
+              onClick={this.handleLoginClick}
+              variant="outlined"
+              style={styles.loginButton}
+            >
               <Typography style={styles.loginText}>Log In</Typography>
             </Button>
             <Typography variant="display3" style={styles.title}>
               CheatFleet
             </Typography>
             <Typography style={styles.subheading} variant="subheading">
-              Unite with classmates to find a better future...
+              Get started by finding your school...
             </Typography>
             <SearchBar
               searchValue={searchValue}
               handleSearchTextChange={this.handleSearchTextChange}
               handleClearText={this.handleClearText}
             />
-            <Suggestions suggestions={suggestions} />
+            <Suggestions
+              suggestions={suggestions}
+              handleSchoolClick={this.handleSchoolClick}
+            />
             <Typography style={styles.footer} variant="caption">
               CheatFleet 2019. all rights reserved.
             </Typography>
