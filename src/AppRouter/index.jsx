@@ -5,18 +5,71 @@ import WelcomePage from "../pages/WelcomePage";
 import LoginPage from "../pages/LoginPage";
 import SignUpPage from "../pages/SignUpPage";
 import ChooseGroupsPage from "../pages/ChooseGroupsPage";
+import firebase from "firebase";
+import AccountsPage from "../pages/AccountsPage";
+import { getUser } from "../services/UserService";
 
 class AppRouter extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isLoggedIn: false,
+      user: {}
+    };
+  }
+
+  componentDidMount() {
+    firebase.auth().onAuthStateChanged(user => {
+      console.log("user: ", user);
+      if (!user) {
+        this.setState({
+          isLoggedIn: false
+        });
+      } else {
+        this.handleGetUserObject(user);
+      }
+    });
+  }
+
+  handleGetUserObject = user => {
+    getUser(user.email)
+      .then(resp => {
+        this.setState({
+          isLoggedIn: true,
+          user: resp.docs[0].data()
+        });
+      })
+      .catch(e => console.log(e));
+  };
   render() {
+    const { isLoggedIn, user } = this.state;
     return (
       <Router>
-        <div>
-          <Route exact path="/" component={WelcomePage} />
-          <Route exact path="/home" component={HomePage} />
-          <Route exact path="/login" component={LoginPage} />
-          <Route exact path="/signUp" component={SignUpPage} />
-          <Route exact path="/group-picker" component={ChooseGroupsPage} />
-        </div>
+        {isLoggedIn ? (
+          <div>
+            <Route
+              exact
+              path="/"
+              render={props => <HomePage user={user} {...props} />}
+            />
+            <Route
+              exact
+              path="/group-picker"
+              render={props => <ChooseGroupsPage user={user} {...props} />}
+            />
+            <Route
+              exact
+              path="/account"
+              render={() => <AccountsPage user={user} />}
+            />
+          </div>
+        ) : (
+          <div>
+            <Route exact path="/" component={WelcomePage} />
+            <Route exact path="/login" component={LoginPage} />
+            <Route exact path="/signUp" component={SignUpPage} />
+          </div>
+        )}
       </Router>
     );
   }
