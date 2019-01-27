@@ -14,7 +14,7 @@ const styles = {
     padding: 20,
     backgroundColor: "white",
     cursor: "pointer",
-    marginLeft: 10
+    marginLeft: 20
   },
   cardHeader: {
     width: "100%",
@@ -72,10 +72,11 @@ class CheatCard extends React.Component {
       comments,
       votes,
       date,
+      cheat,
       handleCardClick
     } = this.props;
     return (
-      <Card style={styles.container} onClick={handleCardClick}>
+      <Card style={styles.container} onClick={() => handleCardClick(cheat)}>
         <div style={styles.cardHeader}>
           <div style={styles.name}>
             <Typography variant="subheading" style={styles.postedBy}>

@@ -45,7 +45,7 @@ class AccountsPage extends React.Component {
         <MainNavBar groupName="Cheat Fleet" />
         <div style={styles.pageContainer}>
           <Card style={styles.cardContainer}>
-            <Typography variant="title">Profile</Typography>
+            <Typography variant="title">My Account</Typography>
             <Tabs
               style={styles.tabs}
               value={currentTab}

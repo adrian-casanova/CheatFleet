@@ -8,6 +8,7 @@ import ChooseGroupsPage from "../pages/ChooseGroupsPage";
 import firebase from "firebase";
 import AccountsPage from "../pages/AccountsPage";
 import { getUser } from "../services/UserService";
+import GroupHomePage from "../pages/GroupHomePage";
 
 class AppRouter extends Component {
   constructor(props) {
@@ -62,6 +63,7 @@ class AppRouter extends Component {
               path="/account"
               render={() => <AccountsPage user={user} />}
             />
+            <Route exact path="/group/:groupId?" component={GroupHomePage} />
           </div>
         ) : (
           <div>

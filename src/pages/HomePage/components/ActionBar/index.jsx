@@ -1,5 +1,5 @@
 import React from "react";
-import { Typography } from "@material-ui/core";
+import { Typography, Tooltip } from "@material-ui/core";
 import { Dashboard, List } from "@material-ui/icons";
 
 const styles = {
@@ -33,6 +33,7 @@ const styles = {
 };
 class ActionBar extends React.Component {
   render() {
+    const { handleGridViewClick, handleListViewClick, gridView } = this.props;
     return (
       <div style={styles.container}>
         <div
@@ -45,8 +46,22 @@ class ActionBar extends React.Component {
           }}
         >
           <Typography style={styles.headerText}>View</Typography>
-          <List style={styles.viewIconsInactive} />
-          <Dashboard style={styles.viewIconsActive} />
+          <Tooltip title="List view">
+            <List
+              onClick={handleListViewClick}
+              style={
+                gridView ? styles.viewIconsInactive : styles.viewIconsActive
+              }
+            />
+          </Tooltip>
+          <Tooltip title="Grid view">
+            <Dashboard
+              onClick={handleGridViewClick}
+              style={
+                gridView ? styles.viewIconsActive : styles.viewIconsInactive
+              }
+            />
+          </Tooltip>
           <div style={styles.divider} />
         </div>
         <div>

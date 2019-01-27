@@ -1,9 +1,19 @@
 import firebase from "firebase";
 const uuidv1 = require("uuid/v1");
 
+const cache = {
+  cheatsList: []
+};
 export const AddCheat = body =>
   new Promise((resolve, reject) => {
-    const { schoolName, groupName, userId, cheatTitle, cheatBody } = body;
+    const {
+      schoolName,
+      groupName,
+      userId,
+      cheatTitle,
+      cheatBody,
+      postedByName
+    } = body;
     const database = firebase.firestore();
     database.settings({
       timestampsInSnapshots: true
@@ -22,8 +32,10 @@ export const AddCheat = body =>
               [postId]: {
                 schoolName,
                 groupName,
+                cheatId: postId,
                 postedBy: userId,
                 cheatTitle,
+                postedByName,
                 cheatBody,
                 comments: [],
                 postDateMs: new Date().getTime(),
@@ -41,7 +53,9 @@ export const AddCheat = body =>
               [postId]: {
                 schoolName,
                 groupName,
+                postedByName,
                 postedBy: userId,
+                cheatId: postId,
                 cheatTitle,
                 cheatBody,
                 comments: [],
@@ -56,8 +70,12 @@ export const AddCheat = body =>
       });
   });
 
-export const handleGetAllCheats = body =>
+export const handleGetAllCheats = (body, reload) =>
   new Promise((resolve, reject) => {
+    if (!reload && cache.cheatsList.length) {
+      resolve(cache.cheatsList[0]);
+    }
+    cache.cheatsList = [];
     const { schoolName } = body;
     const database = firebase.firestore();
     database.settings({
@@ -68,6 +86,7 @@ export const handleGetAllCheats = body =>
       .doc("Cheats")
       .get()
       .then(resp => {
+        cache.cheatsList.push(resp);
         resolve(resp);
       })
       .catch(e => reject(e));

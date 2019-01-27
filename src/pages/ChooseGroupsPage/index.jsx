@@ -98,7 +98,7 @@ class ChooseGroupsPage extends React.Component {
     const selectedGroups = [];
     groups.forEach(group => {
       if (group.isSelected === true) {
-        selectedGroups.push(group);
+        selectedGroups.push(group.groupId);
       }
     });
     return selectedGroups;
@@ -116,7 +116,8 @@ class ChooseGroupsPage extends React.Component {
 
   updateGroups = () => {
     const { schoolName } = this.state;
-    getAllGroups(schoolName)
+    console.log("schoolName: ", schoolName);
+    getAllGroups(schoolName, true)
       .then(resp => this.setState({ groups: Object.values(resp.data()) }))
       .catch(e => console.log("e: ", e));
   };

@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles";
 import AppRouter from "./AppRouter";
 import { primaryBlue } from "./styles";
+import { theme } from "./themes/AppTheme";
 import firebase from "firebase";
 
 const config = {
@@ -13,12 +14,6 @@ const config = {
   messagingSenderId: "766909737735"
 };
 firebase.initializeApp(config);
-const theme = createMuiTheme({
-  palette: {
-    primary: primaryBlue[500],
-    secondary: primaryBlue[500]
-  }
-});
 class App extends Component {
   render() {
     return (

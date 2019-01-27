@@ -33,11 +33,11 @@ class GroupSearchBar extends React.Component {
     this.state = {};
   }
   render() {
-    const { anchorEl, handleSearchInput } = this.props;
+    const { anchorEl, handleSearchInput, inGroup } = this.props;
     return (
       <>
         <TextField
-          placeholder="Search"
+          placeholder={inGroup ? "Search Cheats" : "Search Groups"}
           style={styles.container}
           onChange={e => handleSearchInput(e)}
           InputProps={{

@@ -102,7 +102,7 @@ class MainNavBar extends React.Component {
     this.props.history.push("/");
   };
   render() {
-    const { groupName, handleOpenAddCheatDialog } = this.props;
+    const { groupName, handleOpenAddCheatDialog, inGroup } = this.props;
     const { menuOpen, windowWidth, anchorEl } = this.state;
     return (
       <div>
@@ -120,6 +120,7 @@ class MainNavBar extends React.Component {
             <GroupSearchBar
               handleSearchInput={this.handleSearchInput}
               anchorEl={anchorEl}
+              inGroup={inGroup}
             />
             <div>
               <Tooltip title="Add cheat">
