@@ -3,7 +3,12 @@ import { Grid, GridList, Slide, Fade } from "@material-ui/core";
 import MainNavBar from "../../components/MainNavBar";
 import AddCheatDialog from "./components/AddCheatDialog";
 import { getUsersSchool } from "../../services/SchoolService";
-import { AddCheat, handleGetAllCheats } from "../../services/CheatService";
+import {
+  AddCheat,
+  handleGetAllCheats,
+  upVoteCheat,
+  downVoteCheat
+} from "../../services/CheatService";
 import { getAllGroups } from "../../services/GroupService";
 import CheatCard from "../../components/CheatCard";
 import ActionBar from "./components/ActionBar";
@@ -11,6 +16,7 @@ import SideBar from "../../components/SideBar";
 import OpenedCheatCard from "../../components/OpenedCheatCard";
 import ListCard from "./components/ListCard";
 import { AddComment } from "../../services/CommentService";
+import { sortData } from "../../helperFunctions";
 
 const styles = {
   grid: {
@@ -82,7 +88,6 @@ class HomePage extends React.Component {
             listOfGroups.push(doc);
           }
         });
-        console.log("listOfGroups: ", listOfGroups);
         this.handleGetUsersGroups(listOfGroups);
         this.setState({
           listOfGroups,
@@ -143,18 +148,33 @@ class HomePage extends React.Component {
       });
   };
 
-  handleGetCheats = schoolName => {
-    handleGetAllCheats({ schoolName }).then(resp => {
+  handleGetCheats = (schoolName, reload) => {
+    handleGetAllCheats({ schoolName }, reload).then(resp => {
       if (resp.exists) {
         const cheats = [];
         Object.values(resp.data()).forEach(doc => {
           cheats.push(doc);
         });
+        this.updateOpenedCheat(cheats);
+        const sortedCheats = sortData(cheats, "postedTimeMs");
         this.setState({
-          cheatsList: cheats
+          cheatsList: sortedCheats
         });
       }
     });
+  };
+
+  updateOpenedCheat = cheats => {
+    const { cheatOpened } = this.state;
+    console.log("cheatOpened: ", cheatOpened, "cheats: ", cheats);
+    if (cheatOpened) {
+      const newCheatOpened = cheats.find(
+        cheat => cheat.cheatId === cheatOpened.cheatId
+      );
+      this.setState({
+        cheatOpened: newCheatOpened
+      });
+    }
   };
 
   handleCardClick = cheat => {
@@ -204,8 +224,31 @@ class HomePage extends React.Component {
     const name = user.firstName.concat(" ", user.lastName);
     const currentDate = new Date().getTime();
     AddComment(commentInput, cheatOpened, name, schoolName, currentDate).then(
-      () => console.log("commented")
+      () => {
+        this.handleGetCheats(schoolName, true);
+      }
     );
+  };
+
+  handleUpVote = () => {
+    const { schoolName, cheatOpened } = this.state;
+    const { user } = this.props;
+    upVoteCheat(schoolName, cheatOpened, user.email)
+      .then(resp => {
+        console.log("resp: ", resp);
+        this.handleGetCheats();
+      })
+      .catch(e => console.log("e: ", e));
+  };
+
+  handleDownVote = () => {
+    const { schoolName, cheatOpened } = this.props;
+    const { user } = this.props;
+    downVoteCheat(schoolName, cheatOpened, user.email)
+      .then(resp => {
+        this.handleGetCheats();
+      })
+      .catch(e => console.log("e: ", e));
   };
 
   render() {
@@ -294,6 +337,8 @@ class HomePage extends React.Component {
                 handleCloseCheatCard={this.handleCloseCheatCard}
                 cheatOpened={cheatOpened}
                 user={user}
+                handleUpVote={this.handleUpVote}
+                handleDownVote={this.handleDownVote}
                 commentInput={commentInput}
                 handleAddComment={this.handleAddComment}
                 handleCommentInputChange={this.handleCommentInputChange}

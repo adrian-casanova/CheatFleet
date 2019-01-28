@@ -75,6 +75,7 @@ class CheatCard extends React.Component {
       cheat,
       handleCardClick
     } = this.props;
+    console.log("cheat: ", cheat);
     return (
       <Card style={styles.container} onClick={() => handleCardClick(cheat)}>
         <div style={styles.cardHeader}>

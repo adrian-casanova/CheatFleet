@@ -9,3 +9,15 @@ export const formatData = milliseconds => {
   }
   return `${seconds} seconds ago`;
 };
+
+export const sortData = (data, property) => {
+  const sortedData = data.map(item => {
+    const newComments = item.comments.sort((a, b) => {
+      const propA = a[property];
+      const propB = b[property];
+      return propA - propB;
+    });
+    return Object.assign(item, { comments: newComments.reverse() });
+  });
+  return sortedData;
+};

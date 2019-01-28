@@ -91,3 +91,58 @@ export const handleGetAllCheats = (body, reload) =>
       })
       .catch(e => reject(e));
   });
+
+export const upVoteCheat = (schoolName, cheat, userId) =>
+  new Promise((resolve, reject) => {
+    const database = firebase.firestore();
+    const { cheatId } = cheat;
+    const newUpVotesList = [...cheat.upVotesList, userId];
+    const indexOfDislike = cheat.dislikeList
+      ? cheat.dislikeList.indexOf(userId)
+      : -1;
+    if (indexOfDislike > 0) {
+      cheat.dislikeList.splice(indexOfDislike, 1);
+    }
+    const newCheat = Object.assign(cheat, {
+      likes: cheat.likes + 1,
+      upVotesList: newUpVotesList
+    });
+    database.settings({
+      timestampsInSnapshots: true
+    });
+    database
+      .collection(schoolName)
+      .doc("Cheats")
+      .update({
+        [cheatId]: { ...newCheat }
+      })
+      .then(resp => resolve(resp))
+      .catch(e => reject(e));
+  });
+export const downVoteCheat = (schoolName, cheat, userId) =>
+  new Promise((resolve, reject) => {
+    const database = firebase.firestore();
+    const { cheatId } = cheat;
+    const newDislikeList = [...cheat.dislikeList, userId];
+    const indexOfLike = cheat.upVotesList
+      ? cheat.upVotesList.indexOf(userId)
+      : -1;
+    if (indexOfLike > 0) {
+      cheat.dislikeList.splice(indexOfLike, 1);
+    }
+    const newCheat = Object.assign(cheat, {
+      likes: cheat.likes + 1,
+      dislikeList: newDislikeList
+    });
+    database.settings({
+      timestampsInSnapshots: true
+    });
+    database
+      .collection(schoolName)
+      .doc("Cheats")
+      .update({
+        [cheatId]: { ...newCheat }
+      })
+      .then(resp => resolve(resp))
+      .catch(e => reject(e));
+  });

@@ -116,7 +116,6 @@ class ChooseGroupsPage extends React.Component {
 
   updateGroups = () => {
     const { schoolName } = this.state;
-    console.log("schoolName: ", schoolName);
     getAllGroups(schoolName, true)
       .then(resp => this.setState({ groups: Object.values(resp.data()) }))
       .catch(e => console.log("e: ", e));

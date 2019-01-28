@@ -85,7 +85,8 @@ const styles = {
     color: "green"
   },
   arrowIcons: {
-    color: "gray"
+    color: "gray",
+    cursor: "pointer"
   },
   bodyText: {
     color: "gray",
@@ -153,9 +154,10 @@ class OpenedCheatCard extends React.Component {
       user,
       commentInput,
       handleCommentInputChange,
-      handleAddComment
+      handleAddComment,
+      handleUpVote,
+      handleDownVote
     } = this.props;
-    console.log("cheatOpened: ", cheatOpened);
     return (
       <Card style={styles.container} id="card-container">
         <Tooltip title="Close card" enterDelay={500}>
@@ -194,13 +196,19 @@ class OpenedCheatCard extends React.Component {
               </Typography>
             </div>
             <div style={styles.upvoteContainer}>
-              <KeyboardArrowUp style={styles.arrowIcons} />
+              <KeyboardArrowUp
+                onClick={handleUpVote}
+                style={styles.arrowIcons}
+              />
               <Typography style={styles.upvoteText} variant="subheading">
                 {cheatOpened.likes >= 0
                   ? `+ ${cheatOpened.likes}`
                   : `- ${cheatOpened.likes}`}
               </Typography>
-              <KeyboardArrowDown style={styles.arrowIcons} />
+              <KeyboardArrowDown
+                onClic={handleDownVote}
+                style={styles.arrowIcons}
+              />
             </div>
           </div>
           <div style={styles.divider} />
@@ -248,6 +256,7 @@ class OpenedCheatCard extends React.Component {
             <CommentItem
               comment={comment.comment}
               postedBy={comment.postedBy}
+              postedDate={comment.postedTimeMs}
             />
           ))}
         </div>
