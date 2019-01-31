@@ -75,7 +75,6 @@ class CheatCard extends React.Component {
       cheat,
       handleCardClick
     } = this.props;
-    console.log("cheat: ", cheat);
     return (
       <Card style={styles.container} onClick={() => handleCardClick(cheat)}>
         <div style={styles.cardHeader}>
@@ -91,7 +90,7 @@ class CheatCard extends React.Component {
             variant="subheading"
             style={votes > 0 ? styles.upVotes : styles.downVotes}
           >
-            + {votes}
+            {votes >= 0 ? `+ ${votes}` : votes}
           </Typography>
         </div>
         <Typography variant="title" style={styles.title}>

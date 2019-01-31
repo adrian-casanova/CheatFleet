@@ -13,6 +13,7 @@ import {
 } from "@material-ui/icons";
 import { primaryBlue } from "../../styles";
 import CommentItem from "./components/CommentItem";
+import FileActionDialog from "./components/FileActionDialog";
 
 const fakeText = `Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestias
 vero quae dolores adipisci nisi debitis asperiores, praesentium
@@ -84,8 +85,15 @@ const styles = {
   upvoteText: {
     color: "green"
   },
+  downVoteText: {
+    color: "red"
+  },
   arrowIcons: {
     color: "gray",
+    cursor: "pointer"
+  },
+  arrowIconsActive: {
+    color: primaryBlue,
     cursor: "pointer"
   },
   bodyText: {
@@ -115,13 +123,34 @@ class OpenedCheatCard extends React.Component {
     super(props);
     this.state = {
       holesArray: [],
-      bodyShortened: true
+      bodyShortened: true,
+      upVoted: false,
+      downVoted: false,
+      fileActionsDialog: false
     };
     this.cardRef = "";
   }
   componentDidMount() {
     this.handleGetHoleCount();
+    this.handleGetAlreadyLiked();
   }
+
+  handleGetAlreadyLiked = () => {
+    const { cheatOpened, user } = this.props;
+    const { dislikeList, upVotesList } = cheatOpened;
+    const { email } = user;
+    if (dislikeList.indexOf(email) >= 0) {
+      this.setState({
+        upVoted: false,
+        downVoted: true
+      });
+    } else if (upVotesList.indexOf(email) >= 0) {
+      this.setState({
+        upVoted: true,
+        downVoted: false
+      });
+    }
+  };
 
   handleGetHoleCount = () => {
     const numberOfHoles = Math.floor(
@@ -146,8 +175,35 @@ class OpenedCheatCard extends React.Component {
       bodyShortened: true
     });
   };
+
+  handleUpVoteClick = () => {
+    this.props.handleUpVote();
+    this.handleGetAlreadyLiked();
+  };
+
+  handleDownVoteClick = () => {
+    this.props.handleDownVote();
+    this.handleGetAlreadyLiked();
+  };
+
+  handleFileActionsOpen = () => {
+    this.setState({
+      fileActionsDialog: true
+    });
+  };
+  handleFileActionsClose = () => {
+    this.setState({
+      fileActionsDialog: false
+    });
+  };
   render() {
-    const { holesArray, bodyShortened } = this.state;
+    const {
+      holesArray,
+      bodyShortened,
+      upVoted,
+      downVoted,
+      fileActionsDialog
+    } = this.state;
     const {
       handleCloseCheatCard,
       cheatOpened,
@@ -155,11 +211,16 @@ class OpenedCheatCard extends React.Component {
       commentInput,
       handleCommentInputChange,
       handleAddComment,
-      handleUpVote,
-      handleDownVote
+      handleViewFile
     } = this.props;
     return (
       <Card style={styles.container} id="card-container">
+        <FileActionDialog
+          dialogOpen={fileActionsDialog}
+          downloadUrl={cheatOpened.downloadUrl}
+          handleViewFile={handleViewFile}
+          handleCloseFileActionDialog={this.handleFileActionsClose}
+        />
         <Tooltip title="Close card" enterDelay={500}>
           <Minimize style={styles.backArrow} onClick={handleCloseCheatCard} />
         </Tooltip>
@@ -197,17 +258,24 @@ class OpenedCheatCard extends React.Component {
             </div>
             <div style={styles.upvoteContainer}>
               <KeyboardArrowUp
-                onClick={handleUpVote}
-                style={styles.arrowIcons}
+                onClick={upVoted ? null : this.handleUpVoteClick}
+                style={upVoted ? styles.arrowIconsActive : styles.arrowIcons}
               />
-              <Typography style={styles.upvoteText} variant="subheading">
+              <Typography
+                style={
+                  cheatOpened.likes >= 0
+                    ? styles.upvoteText
+                    : styles.downVoteText
+                }
+                variant="subheading"
+              >
                 {cheatOpened.likes >= 0
                   ? `+ ${cheatOpened.likes}`
-                  : `- ${cheatOpened.likes}`}
+                  : `${cheatOpened.likes}`}
               </Typography>
               <KeyboardArrowDown
-                onClic={handleDownVote}
-                style={styles.arrowIcons}
+                onClick={downVoted ? null : this.handleDownVoteClick}
+                style={downVoted ? styles.arrowIconsActive : styles.arrowIcons}
               />
             </div>
           </div>
@@ -231,6 +299,21 @@ class OpenedCheatCard extends React.Component {
               style={{ alignSelf: "center" }}
             >
               Show Less
+            </Button>
+          )}
+          {cheatOpened.fileName && (
+            <Button
+              onClick={this.handleFileActionsOpen}
+              variant="outlined"
+              style={{
+                borderColor: primaryBlue,
+                width: "30%",
+                marginTop: 20
+              }}
+            >
+              <Typography style={{ color: primaryBlue }}>
+                {cheatOpened.fileName}
+              </Typography>
             </Button>
           )}
           <Typography style={{ color: "green", marginTop: 20 }}>

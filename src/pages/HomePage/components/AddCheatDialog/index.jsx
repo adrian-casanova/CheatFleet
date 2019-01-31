@@ -50,12 +50,15 @@ const styles = {
     color: "white"
   },
   addFileButton: {
-    width: "20%",
+    width: 200,
     marginTop: 20,
     borderColor: primaryBlue
   },
   addFileText: {
     color: primaryBlue
+  },
+  addFileInput: {
+    display: "none"
   }
 };
 class AddCheatDialog extends React.Component {
@@ -66,17 +69,27 @@ class AddCheatDialog extends React.Component {
       cheatBody: "",
       suggestions: [],
       inputFocused: false,
-      groupNameValue: ""
+      groupNameValue: "",
+      currentFile: "",
+      currentFileBlob: ""
     };
     this.groupNameRef = {};
+    this.reader = new FileReader();
   }
-  // componentDidMount() {
+  componentDidMount() {
+    this.handleFileReadCompletion();
+  }
 
-  // }
-  handleAddFile = () => {
-    // const reader = new FileReader();
-    // reader.onloadend = handleFile;
-    // reader.readAsText(file);
+  handleFileReadCompletion = () => {
+    this.reader.addEventListener("loadend", event => {
+      const file = event.srcElement.result;
+      console.log("file: ", file);
+      const fileObject = {
+        file,
+        firstRowContent: "header",
+        delimiter: ","
+      };
+    });
   };
 
   handleInputChange = ({ target }) => {
@@ -92,13 +105,25 @@ class AddCheatDialog extends React.Component {
   };
 
   handleCreateCheat = () => {
-    const { cheatBody, cheatTitle, groupNameValue } = this.state;
-    this.props.handleAddCheat(cheatTitle, cheatBody, groupNameValue);
+    const {
+      cheatBody,
+      cheatTitle,
+      groupNameValue,
+      currentFileBlob,
+      currentFile
+    } = this.state;
+    this.props.handleAddCheat(
+      cheatTitle,
+      cheatBody,
+      groupNameValue,
+      currentFileBlob,
+      currentFile.name
+    );
     this.setState({
-      cheatBody: '',
-      cheatTitle: '',
-      groupNameValue: ''
-    })
+      cheatBody: "",
+      cheatTitle: "",
+      groupNameValue: ""
+    });
   };
 
   handleGroupNameChange = ({ target, currentTarget }) => {
@@ -160,13 +185,44 @@ class AddCheatDialog extends React.Component {
       groupNameValue: groupName
     });
   };
+
+  handleFileInputChange = ({ target }) => {
+    const key = target.name;
+    const filesLength = target.files ? target.files.length : null;
+    if (filesLength === 0) {
+      return "";
+    }
+    const newValue = key === "file" ? target.files[0] : target.value;
+    console.log("new Value: ", newValue);
+    const blob = new Blob(target.files);
+    this.setState({
+      currentFileBlob: blob,
+      currentFile: newValue
+    });
+    // remove file extension from uploaded CSV
+    // if (key === 'file') {
+    //   const { files } = target;
+    //   if (
+    //     files[0].type !== 'text/plain' &&
+    //     files[0].type !== 'text/csv' &&
+    //     files[0].type !== 'application/vnd.ms-excel'
+    //   ) {
+    //     this.setState(() => ({
+    //       uploadError: 'File must be a csv or plain text',
+    //       submitDisabled: true
+    //     }));
+    //     return false;
+    //   }
+    // }
+  };
   render() {
     const {
       cheatTitle,
       cheatBody,
       suggestions,
       anchorEl,
-      groupNameValue
+      groupNameValue,
+      currentFile
     } = this.state;
     const { dialogOpen, handleCloseAddCheatDialog, listOfGroups } = this.props;
     return (
@@ -213,19 +269,43 @@ class AddCheatDialog extends React.Component {
           handleGroupClick={this.handleGroupClick}
           handleInputChange={this.handleGroupNameChange}
         />
-        <Button
-          onClick={this.handleAddFile}
-          variant="outlined"
-          style={styles.addFileButton}
+        <TextField
+          label={
+            <Typography variant="subheading">Upload a CSV file</Typography>
+          }
+          style={styles.addFileInput}
+          name="file"
+          id="outlined-button-file"
+          type="file"
+          accept=".csv"
+          onChange={this.handleFileInputChange}
+        />
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center"
+          }}
         >
-          <Typography style={styles.addFileText}>Add file</Typography>
-        </Button>
+          <label htmlFor="outlined-button-file">
+            <Button
+              variant="outlined"
+              component="span"
+              style={styles.addFileButton}
+            >
+              <Typography style={styles.addFileText}>Add file</Typography>
+            </Button>
+          </label>
+          <Typography style={{ marginLeft: 10, marginTop: 10 }}>
+            {currentFile.name}
+          </Typography>
+        </div>
         <Button
           onClick={this.handleCreateCheat}
           style={styles.button}
           variant="raised"
         >
-          <Typography style={styles.buttonText}>Create Group</Typography>
+          <Typography style={styles.buttonText}>Create Cheat</Typography>
         </Button>
       </Dialog>
     );

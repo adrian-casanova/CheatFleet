@@ -17,6 +17,7 @@ import OpenedCheatCard from "../../components/OpenedCheatCard";
 import ListCard from "./components/ListCard";
 import { AddComment } from "../../services/CommentService";
 import { sortData } from "../../helperFunctions";
+import { uploadCheatFile } from "../../services/StorageService";
 
 const styles = {
   grid: {
@@ -124,28 +125,35 @@ class HomePage extends React.Component {
     });
   };
 
-  handleAddCheat = (cheatTitle, cheatBody, groupName) => {
+  handleAddCheat = (cheatTitle, cheatBody, groupName, fileBlob, fileName) => {
     const { user } = this.props;
-    const { firstName, lastName } = user;
+    const { firstName, lastName, email } = user;
     const postedByName = firstName.concat(` ${lastName}`);
     const { schoolName } = this.state;
-    AddCheat({
-      schoolName,
-      groupName,
-      cheatTitle,
-      cheatBody,
-      userId: user.email,
-      postedByName
-    })
-      .then(() => {
-        this.setState({
-          addCheatDialogOpen: false
-        });
-        this.handleGetCheats(this.state.schoolName, true);
-      })
-      .catch(e => {
-        alert("e");
-      });
+    if (fileBlob) {
+      uploadCheatFile({ email, blob: fileBlob, fileName })
+        .then(resp => {
+          AddCheat({
+            schoolName,
+            groupName,
+            cheatTitle,
+            cheatBody,
+            userId: user.email,
+            postedByName,
+            downloadUrl: resp,
+            fileName
+          }).then(() => {
+            this.setState({
+              addCheatDialogOpen: false
+            });
+            this.handleGetCheats(this.state.schoolName, true);
+          });
+        })
+        .catch(e => console.log("error: ", e));
+    }
+    //   .catch(e => {
+    //     alert("e");
+    //   });
   };
 
   handleGetCheats = (schoolName, reload) => {
@@ -166,7 +174,6 @@ class HomePage extends React.Component {
 
   updateOpenedCheat = cheats => {
     const { cheatOpened } = this.state;
-    console.log("cheatOpened: ", cheatOpened, "cheats: ", cheats);
     if (cheatOpened) {
       const newCheatOpened = cheats.find(
         cheat => cheat.cheatId === cheatOpened.cheatId
@@ -230,23 +237,31 @@ class HomePage extends React.Component {
     );
   };
 
+  handleViewFile = url => {
+    this.props.history.push({
+      pathname: "/file-viewer",
+      state: {
+        url
+      }
+    });
+  };
+
   handleUpVote = () => {
     const { schoolName, cheatOpened } = this.state;
     const { user } = this.props;
     upVoteCheat(schoolName, cheatOpened, user.email)
       .then(resp => {
-        console.log("resp: ", resp);
-        this.handleGetCheats();
+        this.handleGetCheats(schoolName, true);
       })
       .catch(e => console.log("e: ", e));
   };
 
   handleDownVote = () => {
-    const { schoolName, cheatOpened } = this.props;
+    const { schoolName, cheatOpened } = this.state;
     const { user } = this.props;
     downVoteCheat(schoolName, cheatOpened, user.email)
       .then(resp => {
-        this.handleGetCheats();
+        this.handleGetCheats(schoolName, true);
       })
       .catch(e => console.log("e: ", e));
   };
@@ -264,6 +279,7 @@ class HomePage extends React.Component {
       commentInput,
       cheatOpened
     } = this.state;
+    console.log("cheatOpened: ", cheatOpened);
     const { user } = this.props;
     return (
       <div style={styles.container}>
@@ -341,6 +357,7 @@ class HomePage extends React.Component {
                 handleDownVote={this.handleDownVote}
                 commentInput={commentInput}
                 handleAddComment={this.handleAddComment}
+                handleViewFile={this.handleViewFile}
                 handleCommentInputChange={this.handleCommentInputChange}
               />
             </Slide>

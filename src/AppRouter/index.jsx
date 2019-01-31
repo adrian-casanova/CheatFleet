@@ -7,6 +7,7 @@ import SignUpPage from "../pages/SignUpPage";
 import ChooseGroupsPage from "../pages/ChooseGroupsPage";
 import firebase from "firebase";
 import AccountsPage from "../pages/AccountsPage";
+import FileViewer from "../pages/FileViewer";
 import { getUser } from "../services/UserService";
 import GroupHomePage from "../pages/GroupHomePage";
 
@@ -64,6 +65,7 @@ class AppRouter extends Component {
               render={() => <AccountsPage user={user} />}
             />
             <Route exact path="/group/:groupId?" component={GroupHomePage} />
+            <Route exact path="/file-viewer" component={FileViewer} />
           </div>
         ) : (
           <div>

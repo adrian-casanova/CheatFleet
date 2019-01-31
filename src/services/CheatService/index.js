@@ -12,7 +12,9 @@ export const AddCheat = body =>
       userId,
       cheatTitle,
       cheatBody,
-      postedByName
+      postedByName,
+      downloadUrl,
+      fileName
     } = body;
     const database = firebase.firestore();
     database.settings({
@@ -36,7 +38,11 @@ export const AddCheat = body =>
                 postedBy: userId,
                 cheatTitle,
                 postedByName,
+                fileName,
+                downloadUrl,
                 cheatBody,
+                upVotesList: [],
+                dislikeList: [],
                 comments: [],
                 postDateMs: new Date().getTime(),
                 postDataString: new Date().toLocaleString(),
@@ -58,6 +64,10 @@ export const AddCheat = body =>
                 cheatId: postId,
                 cheatTitle,
                 cheatBody,
+                fileName,
+                downloadUrl,
+                upVotesList: [],
+                dislikeList: [],
                 comments: [],
                 postDateMs: new Date().getTime(),
                 postDateString: new Date().toLocaleString(),
@@ -100,7 +110,7 @@ export const upVoteCheat = (schoolName, cheat, userId) =>
     const indexOfDislike = cheat.dislikeList
       ? cheat.dislikeList.indexOf(userId)
       : -1;
-    if (indexOfDislike > 0) {
+    if (indexOfDislike >= 0) {
       cheat.dislikeList.splice(indexOfDislike, 1);
     }
     const newCheat = Object.assign(cheat, {
@@ -127,11 +137,11 @@ export const downVoteCheat = (schoolName, cheat, userId) =>
     const indexOfLike = cheat.upVotesList
       ? cheat.upVotesList.indexOf(userId)
       : -1;
-    if (indexOfLike > 0) {
-      cheat.dislikeList.splice(indexOfLike, 1);
+    if (indexOfLike >= 0) {
+      cheat.upVotesList.splice(indexOfLike, 1);
     }
     const newCheat = Object.assign(cheat, {
-      likes: cheat.likes + 1,
+      likes: cheat.likes - 1,
       dislikeList: newDislikeList
     });
     database.settings({
