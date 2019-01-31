@@ -21,7 +21,6 @@ class FileViewer extends React.Component {
   }
   render() {
     const { fileUrl } = this.state;
-    console.log("fileUrl: ", fileUrl);
     return (
       <div>{fileUrl && <FileViewerr fileType="docx" filePath={fileUrl} />}</div>
     );

@@ -5,10 +5,13 @@ import {
   TextField,
   Divider,
   Button,
-  Typography
+  Typography,
+  CircularProgress
 } from "@material-ui/core";
 import { primaryBlue } from "../../../../styles";
 import GroupsSelector from "./components/GroupsSelector";
+import { uploadCheatFile } from "../../../../services/StorageService";
+import { AddCheat } from "../../../../services/CheatService";
 
 const styles = {
   textField: {
@@ -71,15 +74,31 @@ class AddCheatDialog extends React.Component {
       inputFocused: false,
       groupNameValue: "",
       currentFile: "",
-      currentFileBlob: ""
+      currentFileBlob: "",
+      uploadError: "",
+      showSpinner: false
     };
     this.groupNameRef = {};
     this.reader = new FileReader();
   }
   componentDidMount() {
+    this.resetState();
     this.handleFileReadCompletion();
   }
 
+  resetState = () => {
+    this.setState({
+      cheatTitle: "",
+      cheatBody: "",
+      suggestions: [],
+      inputFocused: false,
+      groupNameValue: "",
+      currentFile: "",
+      currentFileBlob: "",
+      uploadError: "",
+      showSpinner: false
+    });
+  };
   handleFileReadCompletion = () => {
     this.reader.addEventListener("loadend", event => {
       const file = event.srcElement.result;
@@ -105,6 +124,9 @@ class AddCheatDialog extends React.Component {
   };
 
   handleCreateCheat = () => {
+    this.setState({
+      showSpinner: true
+    });
     const {
       cheatBody,
       cheatTitle,
@@ -112,7 +134,7 @@ class AddCheatDialog extends React.Component {
       currentFileBlob,
       currentFile
     } = this.state;
-    this.props.handleAddCheat(
+    this.handleAddCheat(
       cheatTitle,
       cheatBody,
       groupNameValue,
@@ -186,6 +208,52 @@ class AddCheatDialog extends React.Component {
     });
   };
 
+  handleAddCheat = (cheatTitle, cheatBody, groupName, fileBlob, fileName) => {
+    const { user } = this.props;
+    const { firstName, lastName, email } = user;
+    const postedByName = firstName.concat(` ${lastName}`);
+    const { schoolName } = this.props;
+    if (fileBlob) {
+      uploadCheatFile({ email, blob: fileBlob, fileName })
+        .then(resp => {
+          AddCheat({
+            schoolName,
+            groupName,
+            cheatTitle,
+            cheatBody,
+            userId: user.email,
+            postedByName,
+            downloadUrl: resp,
+            fileName
+          }).then(() => {
+            this.props.handleGetCheats(schoolName, true);
+            this.setState({
+              showSpinner: false
+            });
+          });
+        })
+        .catch(e => console.log("error: ", e));
+    } else {
+      AddCheat({
+        schoolName,
+        groupName,
+        cheatTitle,
+        cheatBody,
+        userId: user.email,
+        postedByName,
+        downloadUrl: "",
+        fileName: ""
+      })
+        .then(() => {
+          this.setState({
+            showSpinner: false
+          });
+          this.props.handleGetCheats(schoolName, true);
+        })
+        .catch(e => console.log("error: ", e));
+    }
+  };
+
   handleFileInputChange = ({ target }) => {
     const key = target.name;
     const filesLength = target.files ? target.files.length : null;
@@ -193,27 +261,39 @@ class AddCheatDialog extends React.Component {
       return "";
     }
     const newValue = key === "file" ? target.files[0] : target.value;
-    console.log("new Value: ", newValue);
     const blob = new Blob(target.files);
+    // remove file extension from uploaded CSV
+    if (key === "file") {
+      const { files } = target;
+      if (
+        files[0].type !== "text/plain" &&
+        files[0].type !== "text/csv" &&
+        files[0].type !== "image/png" &&
+        files[0].type !== "image/jpg" &&
+        files[0].type !== "application/vnd.ms-excel" &&
+        files[0].type !== "application/pdf" &&
+        files[0].type !==
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+      ) {
+        this.setState(() => ({
+          uploadError: "Unsupported file type",
+          submitDisabled: true
+        }));
+        return false;
+      }
+      if (files[0].size > 5000000) {
+        this.setState({
+          uploadError: "File size too big. Limit 5 mb.",
+          submitDisabled: true
+        });
+        return false;
+      }
+    }
     this.setState({
       currentFileBlob: blob,
-      currentFile: newValue
+      currentFile: newValue,
+      uploadError: false
     });
-    // remove file extension from uploaded CSV
-    // if (key === 'file') {
-    //   const { files } = target;
-    //   if (
-    //     files[0].type !== 'text/plain' &&
-    //     files[0].type !== 'text/csv' &&
-    //     files[0].type !== 'application/vnd.ms-excel'
-    //   ) {
-    //     this.setState(() => ({
-    //       uploadError: 'File must be a csv or plain text',
-    //       submitDisabled: true
-    //     }));
-    //     return false;
-    //   }
-    // }
   };
   render() {
     const {
@@ -222,7 +302,9 @@ class AddCheatDialog extends React.Component {
       suggestions,
       anchorEl,
       groupNameValue,
-      currentFile
+      currentFile,
+      uploadError,
+      showSpinner
     } = this.state;
     const { dialogOpen, handleCloseAddCheatDialog, listOfGroups } = this.props;
     return (
@@ -235,78 +317,105 @@ class AddCheatDialog extends React.Component {
             width: 700,
             paddingBottom: 20,
             paddingLeft: 50,
-            paddingRight: 50
+            paddingRight: 50,
+            height: 500
           }
         }}
       >
         <DialogTitle style={{ paddingLeft: 0 }}>Create New Cheat</DialogTitle>
         <Divider />
-        <TextField
-          InputProps={{ disableUnderline: true }}
-          style={styles.textField}
-          id="cheatTitle"
-          autoFocus
-          value={cheatTitle}
-          onChange={this.handleCheatInputChange}
-          placeholder="Cheat title (required)"
-        />
-        <TextField
-          InputProps={{ disableUnderline: true }}
-          style={styles.textFieldDescription}
-          multiline
-          value={cheatBody}
-          id="cheatBody"
-          onChange={e => this.handleCheatInputChange(e)}
-          placeholder="Enter text (optional)"
-        />
-        <GroupsSelector
-          anchorEl={anchorEl}
-          listOfGroups={listOfGroups}
-          onBlur={this.handleOnBlur}
-          onFocus={this.handleOnFocus}
-          suggestions={suggestions}
-          groupNameValue={groupNameValue}
-          handleGroupClick={this.handleGroupClick}
-          handleInputChange={this.handleGroupNameChange}
-        />
-        <TextField
-          label={
-            <Typography variant="subheading">Upload a CSV file</Typography>
-          }
-          style={styles.addFileInput}
-          name="file"
-          id="outlined-button-file"
-          type="file"
-          accept=".csv"
-          onChange={this.handleFileInputChange}
-        />
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center"
-          }}
-        >
-          <label htmlFor="outlined-button-file">
-            <Button
-              variant="outlined"
-              component="span"
-              style={styles.addFileButton}
+        {showSpinner ? (
+          <div
+            style={{
+              height: "100%",
+              width: "100%",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              flexDirection: "column"
+            }}
+          >
+            <CircularProgress style={{ color: primaryBlue }} />
+            <Typography variant="title">Cheating in progress...</Typography>
+          </div>
+        ) : (
+          <React.Fragment>
+            <TextField
+              InputProps={{ disableUnderline: true }}
+              style={styles.textField}
+              id="cheatTitle"
+              autoFocus
+              value={cheatTitle}
+              onChange={this.handleCheatInputChange}
+              placeholder="Cheat title (required)"
+            />
+            <TextField
+              InputProps={{ disableUnderline: true }}
+              style={styles.textFieldDescription}
+              multiline
+              value={cheatBody}
+              id="cheatBody"
+              onChange={e => this.handleCheatInputChange(e)}
+              placeholder="Enter text (optional)"
+            />
+            <GroupsSelector
+              anchorEl={anchorEl}
+              listOfGroups={listOfGroups}
+              onBlur={this.handleOnBlur}
+              onFocus={this.handleOnFocus}
+              suggestions={suggestions}
+              groupNameValue={groupNameValue}
+              handleGroupClick={this.handleGroupClick}
+              handleInputChange={this.handleGroupNameChange}
+            />
+            <TextField
+              label={
+                <Typography variant="subheading">Upload a CSV file</Typography>
+              }
+              style={styles.addFileInput}
+              name="file"
+              id="outlined-button-file"
+              type="file"
+              accept=".csv"
+              onChange={this.handleFileInputChange}
+            />
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center"
+              }}
             >
-              <Typography style={styles.addFileText}>Add file</Typography>
+              <label htmlFor="outlined-button-file">
+                <Button
+                  variant="outlined"
+                  component="span"
+                  style={styles.addFileButton}
+                >
+                  <Typography style={styles.addFileText}>Add file</Typography>
+                </Button>
+              </label>
+              {uploadError ? (
+                <Typography
+                  style={{ marginLeft: 10, marginTop: 20, color: "red" }}
+                >
+                  {uploadError}
+                </Typography>
+              ) : (
+                <Typography style={{ marginLeft: 10, marginTop: 20 }}>
+                  {currentFile.name}
+                </Typography>
+              )}
+            </div>
+            <Button
+              onClick={this.handleCreateCheat}
+              style={styles.button}
+              variant="raised"
+            >
+              <Typography style={styles.buttonText}>Create Cheat</Typography>
             </Button>
-          </label>
-          <Typography style={{ marginLeft: 10, marginTop: 10 }}>
-            {currentFile.name}
-          </Typography>
-        </div>
-        <Button
-          onClick={this.handleCreateCheat}
-          style={styles.button}
-          variant="raised"
-        >
-          <Typography style={styles.buttonText}>Create Cheat</Typography>
-        </Button>
+          </React.Fragment>
+        )}
       </Dialog>
     );
   }

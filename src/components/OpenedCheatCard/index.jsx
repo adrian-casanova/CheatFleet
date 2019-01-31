@@ -9,7 +9,7 @@ import {
 import {
   KeyboardArrowUp,
   KeyboardArrowDown,
-  Minimize
+  ArrowBack
 } from "@material-ui/icons";
 import { primaryBlue } from "../../styles";
 import CommentItem from "./components/CommentItem";
@@ -36,6 +36,7 @@ const styles = {
   container: {
     width: "100%",
     marginLeft: 20,
+    height: "100%",
     paddingTop: 80,
     paddingBottom: 80,
     paddingLeft: 40,
@@ -222,7 +223,7 @@ class OpenedCheatCard extends React.Component {
           handleCloseFileActionDialog={this.handleFileActionsClose}
         />
         <Tooltip title="Close card" enterDelay={500}>
-          <Minimize style={styles.backArrow} onClick={handleCloseCheatCard} />
+          <ArrowBack style={styles.backArrow} onClick={handleCloseCheatCard} />
         </Tooltip>
         <div
           style={{

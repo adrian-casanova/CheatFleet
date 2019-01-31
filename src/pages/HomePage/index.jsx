@@ -1,5 +1,12 @@
 import React from "react";
-import { Grid, GridList, Slide, Fade } from "@material-ui/core";
+import {
+  Grid,
+  GridList,
+  Slide,
+  Fade,
+  Button,
+  Typography
+} from "@material-ui/core";
 import MainNavBar from "../../components/MainNavBar";
 import AddCheatDialog from "./components/AddCheatDialog";
 import { getUsersSchool } from "../../services/SchoolService";
@@ -18,6 +25,8 @@ import ListCard from "./components/ListCard";
 import { AddComment } from "../../services/CommentService";
 import { sortData } from "../../helperFunctions";
 import { uploadCheatFile } from "../../services/StorageService";
+import { primaryBlue } from "../../styles";
+import ToolBar from "./components/ToolBar";
 
 const styles = {
   grid: {
@@ -31,8 +40,10 @@ const styles = {
     width: "100%",
     display: "flex",
     flexDirection: "row",
-    // justifyContent: "center"
-    height: "100%"
+    justifyContent: "center",
+    // height: "100%",
+    paddingBottom: 5,
+    margin: 0
   },
   container: {
     display: "flex",
@@ -125,38 +136,10 @@ class HomePage extends React.Component {
     });
   };
 
-  handleAddCheat = (cheatTitle, cheatBody, groupName, fileBlob, fileName) => {
-    const { user } = this.props;
-    const { firstName, lastName, email } = user;
-    const postedByName = firstName.concat(` ${lastName}`);
-    const { schoolName } = this.state;
-    if (fileBlob) {
-      uploadCheatFile({ email, blob: fileBlob, fileName })
-        .then(resp => {
-          AddCheat({
-            schoolName,
-            groupName,
-            cheatTitle,
-            cheatBody,
-            userId: user.email,
-            postedByName,
-            downloadUrl: resp,
-            fileName
-          }).then(() => {
-            this.setState({
-              addCheatDialogOpen: false
-            });
-            this.handleGetCheats(this.state.schoolName, true);
-          });
-        })
-        .catch(e => console.log("error: ", e));
-    }
-    //   .catch(e => {
-    //     alert("e");
-    //   });
-  };
-
   handleGetCheats = (schoolName, reload) => {
+    this.setState({
+      addCheatDialogOpen: false
+    });
     handleGetAllCheats({ schoolName }, reload).then(resp => {
       if (resp.exists) {
         const cheats = [];
@@ -283,10 +266,7 @@ class HomePage extends React.Component {
     const { user } = this.props;
     return (
       <div style={styles.container}>
-        <MainNavBar
-          handleOpenAddCheatDialog={this.handleOpenAddCheatDialog}
-          groupName={schoolName}
-        />
+        <MainNavBar groupName={schoolName} />
         <ActionBar
           handleGridViewClick={this.handleGridViewClick}
           handleListViewClick={this.handleListViewClick}
@@ -297,15 +277,18 @@ class HomePage extends React.Component {
           dialogOpen={addCheatDialogOpen}
           listOfGroups={listOfGroups}
           handleAddCheat={this.handleAddCheat}
+          schoolName={schoolName}
+          user={user}
+          handleGetCheats={this.handleGetCheats}
         />
         <div
           style={{
             display: "flex",
             flexDirection: "row",
             paddingTop: 40,
-            paddingBttom: 40,
-            paddingLeft: 40,
-            paddingRight: 40,
+            paddingBottom: 40,
+            paddingRight: 35,
+            paddingLeft: windowWidth > 750 ? 35 : 10,
             justifyContent: "space-between"
           }}
         >
@@ -316,12 +299,25 @@ class HomePage extends React.Component {
             />
           )}
           {!cardOpened ? (
-            <React.Fragment>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                width: "100%",
+                paddingRight: windowWidth > 750 ? 0 : 10,
+                paddingLeft: windowWidth > 750 ? 0 : 10
+              }}
+            >
+              <Slide direction="down" in>
+                <ToolBar
+                  handleOpenAddCheatDialog={this.handleOpenAddCheatDialog}
+                />
+              </Slide>
               {gridView ? (
                 <GridList cellHeight={160} style={styles.gridList} cols={3}>
                   {cheatsList.map(item => (
                     <Slide
-                      direction="down"
+                      direction="up"
                       in={!cardOpened}
                       mountOnEnter
                       unmountOnExit
@@ -341,12 +337,14 @@ class HomePage extends React.Component {
                   ))}
                 </GridList>
               ) : (
-                <ListCard
-                  cheatsList={cheatsList}
-                  handleCheatClick={this.handleCardClick}
-                />
+                <Slide direction="up" in={!gridView}>
+                  <ListCard
+                    cheatsList={cheatsList}
+                    handleCheatClick={this.handleCardClick}
+                  />
+                </Slide>
               )}
-            </React.Fragment>
+            </div>
           ) : (
             <Slide direction="up" in={cardOpened} mountOnEnter unmountOnExit>
               <OpenedCheatCard

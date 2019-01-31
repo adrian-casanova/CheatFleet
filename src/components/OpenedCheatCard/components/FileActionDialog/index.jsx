@@ -16,7 +16,7 @@ class FileActionDialog extends React.Component {
         onBackdropClick={handleCloseFileActionDialog}
         PaperProps={{
           style: {
-            height: 200,
+            height: 150,
             display: "flex",
             width: 500,
             padding: 20,
@@ -26,7 +26,10 @@ class FileActionDialog extends React.Component {
         }}
       >
         <DialogTitle>File Action</DialogTitle>
-        <Typography variant="subheading" style={{ color: "gray" }}>
+        <Typography
+          variant="subheading"
+          style={{ color: "gray", marginLeft: 20, marginBottom: 20 }}
+        >
           What would you like to do with the file?
         </Typography>
         <div

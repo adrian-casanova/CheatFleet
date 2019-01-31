@@ -123,14 +123,6 @@ class MainNavBar extends React.Component {
               inGroup={inGroup}
             />
             <div>
-              <Tooltip title="Add cheat">
-                <IconButton
-                  onClick={handleOpenAddCheatDialog}
-                  style={styles.icon}
-                >
-                  <Add fontSize="large" style={styles.icon} />
-                </IconButton>
-              </Tooltip>
               <Tooltip title="User">
                 <IconButton
                   buttonRef={node => {

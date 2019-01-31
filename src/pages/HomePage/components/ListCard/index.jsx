@@ -8,7 +8,8 @@ const styles = {
     height: "100%",
     display: "flex",
     flexDirection: "column",
-    marginLeft: 20
+    marginLeft: 20,
+    marginTop: 40
   }
 };
 class ListCard extends React.Component {

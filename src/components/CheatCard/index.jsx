@@ -14,7 +14,9 @@ const styles = {
     padding: 20,
     backgroundColor: "white",
     cursor: "pointer",
-    marginLeft: 20
+    marginLeft: 10,
+    marginRight: 10,
+    height: "100%"
   },
   cardHeader: {
     width: "100%",
