@@ -1,5 +1,5 @@
-import React, { Component } from "react";
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import React, { Component, useState, useEffect } from "react";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import HomePage from "../pages/HomePage";
 import WelcomePage from "../pages/WelcomePage";
 import LoginPage from "../pages/LoginPage";
@@ -10,73 +10,70 @@ import AccountsPage from "../pages/AccountsPage";
 import FileViewer from "../pages/FileViewer";
 import { getUser } from "../services/UserService";
 import GroupHomePage from "../pages/GroupHomePage";
+import LandingPage from "../pages/LandingPage";
+import MainAppBar from "../components/MainAppBar";
+import RegisterPage from "../pages/RegisterPage";
 
-class AppRouter extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      isLoggedIn: false,
-      user: {}
-    };
-  }
+const AppRouter = ({ history }) => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState({});
 
-  componentDidMount() {
+  useEffect(() => {
     firebase.auth().onAuthStateChanged(user => {
       console.log("user: ", user);
       if (!user) {
-        this.setState({
-          isLoggedIn: false
-        });
+        setIsLoggedIn(false);
       } else {
-        this.handleGetUserObject(user);
+        handleGetUserObject(user);
       }
     });
-  }
+  });
 
-  handleGetUserObject = user => {
+  const handleGetUserObject = user => {
     getUser(user.email)
       .then(resp => {
-        this.setState({
-          isLoggedIn: true,
-          user: resp.docs[0].data()
-        });
+        setIsLoggedIn(true);
+        setUser(resp.docs[0].data());
       })
       .catch(e => console.log(e));
   };
-  render() {
-    const { isLoggedIn, user } = this.state;
-    return (
-      <Router>
-        {isLoggedIn ? (
-          <div>
-            <Route
-              exact
-              path="/"
-              render={props => <HomePage user={user} {...props} />}
-            />
-            <Route
-              exact
-              path="/group-picker"
-              render={props => <ChooseGroupsPage user={user} {...props} />}
-            />
-            <Route
-              exact
-              path="/account"
-              render={() => <AccountsPage user={user} />}
-            />
-            <Route exact path="/group/:groupId?" component={GroupHomePage} />
-            <Route exact path="/file-viewer" component={FileViewer} />
-          </div>
-        ) : (
-          <div>
-            <Route exact path="/" component={WelcomePage} />
-            <Route exact path="/login" component={LoginPage} />
-            <Route exact path="/signUp" component={SignUpPage} />
-          </div>
-        )}
-      </Router>
-    );
-  }
-}
+
+  return (
+    <Router>
+      <React.Fragment>
+        <Route path="/" render={() => <MainAppBar />} />
+        <Switch>
+          {isLoggedIn ? (
+            <div>
+              <Route
+                exact
+                path="/"
+                render={props => <HomePage user={user} {...props} />}
+              />
+              <Route
+                exact
+                path="/group-picker"
+                render={props => <ChooseGroupsPage user={user} {...props} />}
+              />
+              <Route
+                exact
+                path="/account"
+                render={() => <AccountsPage user={user} />}
+              />
+              <Route exact path="/group/:groupId?" component={GroupHomePage} />
+              <Route exact path="/file-viewer" component={FileViewer} />
+            </div>
+          ) : (
+            <div>
+              <Route exact path="/" component={LandingPage} />
+              <Route exact path="/login" component={LoginPage} />
+              <Route exact path="/register" component={RegisterPage} />
+            </div>
+          )}
+        </Switch>
+      </React.Fragment>
+    </Router>
+  );
+};
 
 export default AppRouter;

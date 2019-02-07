@@ -11,7 +11,7 @@ export const theme = createMuiTheme({
     }
   },
   typography: {
-    fontFamily: "Montserrat",
+    fontFamily: "'Roboto Condensed', sans-serif",
     title: {
       fontSize: "24px"
     }

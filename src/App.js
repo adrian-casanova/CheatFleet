@@ -14,14 +14,12 @@ const config = {
   messagingSenderId: "766909737735"
 };
 firebase.initializeApp(config);
-class App extends Component {
-  render() {
-    return (
-      <MuiThemeProvider theme={theme}>
-        <AppRouter />
-      </MuiThemeProvider>
-    );
-  }
-}
+const App = () => {
+  return (
+    <MuiThemeProvider theme={theme}>
+      <AppRouter />
+    </MuiThemeProvider>
+  );
+};
 
 export default App;
