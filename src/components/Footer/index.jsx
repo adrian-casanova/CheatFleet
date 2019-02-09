@@ -11,8 +11,7 @@ const styles = {
   container: {
     height: 150,
     padding: 50,
-    width: "100%",
-    backgroundColor: "rgba(99,199,246, 0.5)",
+    backgroundColor: "rgba(99,199,246, 0.8)",
     display: "flex",
     flexDirection: "row"
   },
@@ -22,9 +21,9 @@ const styles = {
   },
   subContainer: {
     display: "flex",
-    marginLeft: 40,
     flexDirection: "column",
     height: 100,
+    marginLeft: 20,
     justifyContent: "space-between"
   },
   icons: {
@@ -63,6 +62,26 @@ const Footer = () => {
             Terms
           </Typography>
         </div>
+        <div style={styles.subContainer}>
+          <Typography
+            variant="title"
+            style={{ marginLeft: 10, color: "white", cursor: "pointer" }}
+          >
+            About Us
+          </Typography>
+          <Typography
+            variant="subheading"
+            style={{ marginLeft: 10, color: "white", cursor: "pointer" }}
+          >
+            Contact Us
+          </Typography>
+          <Typography
+            variant="subheading"
+            style={{ marginLeft: 10, color: "white", cursor: "pointer" }}
+          >
+            Carreers
+          </Typography>
+        </div>
       </div>
       <div
         style={{
@@ -74,7 +93,7 @@ const Footer = () => {
         }}
       >
         <Typography style={{ color: "gray" }} variant="subheading">
-          Powered with <span role="img">🔥</span>by CheatFleet.
+          Powered <span role="img">🚀</span>by CheatFleet.
         </Typography>
       </div>
     </React.Fragment>

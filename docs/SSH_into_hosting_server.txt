@@ -1,0 +1,7 @@
+##cheatfleet ssh
+-----------------------
+ssh -p 21098 cheaqiqs@198.54.116.93
+
+##Copy files to remote 
+---------------------------------------
+scp -P 21098 ./build/index.html cheaqiqs@198.54.116.93:/home/cheaqiqs

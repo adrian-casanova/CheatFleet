@@ -4,7 +4,9 @@ import {
   TextField,
   withStyles,
   Grid,
-  Button
+  Button,
+  Fade,
+  Zoom
 } from "@material-ui/core";
 import Footer from "../../components/Footer";
 import { primaryBlue } from "../../styles";
@@ -26,14 +28,16 @@ const styles = {
   },
   signUpBox: {
     height: 500,
-    width: "35%",
-    minWidth: 350,
+    width: "55%",
+    minWidth: 300,
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    paddingTop: 50,
-    paddingBottom: 50,
-    backgroundColor: "rgba(99,199,246, 0.1)"
+    paddingTop: 80,
+    paddingBottom: 120,
+    paddingLeft: 20,
+    paddingRight: 20,
+    backgroundColor: "rgba(223,243,253,0.85)"
   },
   signUpText: {
     color: "#4c4c4c",
@@ -68,7 +72,9 @@ const inputStyles = {
   root: {
     backgroundColor: "#f9f9f9",
     borderRadius: 5,
-    margin: 10,
+    marginLeft: 10,
+    marginRight: 10,
+    marginTop: 30,
     "&:hover:not($disabled):not($focused):not($error) $notchedOutline": {
       borderColor: primaryBlue,
       borderWidth: 2
@@ -82,81 +88,86 @@ const inputStyles = {
 const RegisterPage = ({ classes }) => {
   return (
     <div style={styles.container}>
-      <div style={styles.firstBox}>
-        <div style={styles.signUpBox}>
-          <Typography variant="display1" style={styles.signUpText}>
-            Register
-          </Typography>
-          <div style={styles.divider} />
-          <Typography variant="subheading" style={styles.alreadyAccount}>
-            Already have an account?
-          </Typography>
-          <Grid container xs={12} style={styles.nameContainers}>
-            <TextField
-              InputProps={{
-                classes
-              }}
-              style={{ width: "50%" }}
-              variant="outlined"
-              placeholder="First Name"
-            />
-            <TextField
-              InputProps={{
-                classes
-              }}
-              style={{ width: "50%" }}
-              variant="outlined"
-              placeholder="Last Name"
-            />
-            <TextField
-              InputProps={{
-                classes
-              }}
-              style={{
-                width: "100%",
-                minWidth: 200
-              }}
-              variant="outlined"
-              placeholder="E-mail"
-            />
-            <TextField
-              InputProps={{
-                classes
-              }}
-              style={{
-                width: "100%",
-                minWidth: 200
-              }}
-              variant="outlined"
-              type="password"
-              placeholder="Password"
-            />
-            <TextField
-              InputProps={{
-                classes
-              }}
-              style={{
-                width: "100%",
-                minWidth: 200
-              }}
-              variant="outlined"
-              type="password"
-              placeholder="Confirm Password"
-            />
-            <Button
-              style={{
-                width: "100%",
-                height: 50,
-                margin: 10,
-                backgroundColor: primaryBlue,
-                color: "white"
-              }}
-            >
+      <Zoom in>
+        <div style={styles.firstBox}>
+          <div style={styles.signUpBox}>
+            <Typography variant="display1" style={styles.signUpText}>
               Register
-            </Button>
-          </Grid>
+            </Typography>
+            <div style={styles.divider} />
+            <Typography variant="subheading" style={styles.alreadyAccount}>
+              Already have an account?
+            </Typography>
+            <Grid container xs={12} style={styles.nameContainers}>
+              <TextField
+                InputProps={{
+                  classes
+                }}
+                style={{ width: "50%" }}
+                variant="outlined"
+                placeholder="First Name"
+              />
+              <TextField
+                InputProps={{
+                  classes
+                }}
+                style={{ width: "50%" }}
+                variant="outlined"
+                placeholder="Last Name"
+              />
+              <TextField
+                InputProps={{
+                  classes
+                }}
+                style={{
+                  width: "100%",
+                  minWidth: 200
+                }}
+                variant="outlined"
+                placeholder="E-mail"
+              />
+              <TextField
+                InputProps={{
+                  classes
+                }}
+                style={{
+                  width: "100%",
+                  minWidth: 200
+                }}
+                variant="outlined"
+                type="password"
+                placeholder="Password"
+              />
+              <TextField
+                InputProps={{
+                  classes
+                }}
+                style={{
+                  width: "100%",
+                  minWidth: 200
+                }}
+                variant="outlined"
+                type="password"
+                placeholder="Confirm Password"
+              />
+              <Button
+                style={{
+                  width: "100%",
+                  height: 50,
+                  marginLeft: 10,
+                  marginRight: 10,
+                  marginTop: 40,
+                  marginBottom: 40,
+                  backgroundColor: primaryBlue,
+                  color: "white"
+                }}
+              >
+                Register
+              </Button>
+            </Grid>
+          </div>
         </div>
-      </div>
+      </Zoom>
       <Footer />
     </div>
   );
