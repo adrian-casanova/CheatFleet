@@ -168,7 +168,6 @@ const RegisterPage = ({ classes }) => {
           </div>
         </div>
       </Zoom>
-      <Footer />
     </div>
   );
 };

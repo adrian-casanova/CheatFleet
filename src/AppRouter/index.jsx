@@ -17,6 +17,7 @@ import NewLoginPage from "../pages/NewLoginPage";
 import { CircularProgress } from "@material-ui/core";
 import { schools } from "../datasets/colleges";
 import GroupSelectionPage from "../pages/GroupSelectionPage";
+import Footer from "../components/Footer";
 
 const AppRouter = ({ history }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -142,6 +143,7 @@ const AppRouter = ({ history }) => {
             )}
           </Switch>
         )}
+        <Footer />
       </React.Fragment>
     </Router>
   );

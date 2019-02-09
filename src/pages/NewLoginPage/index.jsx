@@ -197,7 +197,6 @@ const NewLoginPage = ({ classes, history }) => {
           </div>
         </div>
       </Zoom>
-      <Footer />
     </div>
   );
 };
