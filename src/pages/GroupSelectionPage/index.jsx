@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Typography, Card, Button, Grid } from "@material-ui/core";
 import { AddBox } from "@material-ui/icons";
 import { primaryBlue } from "../../styles";
@@ -7,6 +7,7 @@ import GroupCard from "./components/GroupCard";
 import Footer from "../../components/Footer";
 import NewGroupDialog from "./components/NewGroupDialog";
 import GenericDialog from "../../components/GenericDialog";
+import { getAllSchoolGroups } from "../../services/GroupService";
 
 const sample = [
   {
@@ -116,13 +117,38 @@ const styles = {
     paddingBottom: 40
   }
 };
-const GroupSelectionPage = () => {
+const GroupSelectionPage = ({ user }) => {
   const [groupsSelected, setGroupsSelected] = useState([]);
-  const [groups, setGroups] = useState(sample);
+  const [groups, setGroups] = useState([]);
   const [sortedBy, setSortedBy] = useState("Most Cheaters");
   const [newGroupDialogOpen, setNewGroupDialogOpen] = useState(false);
   const [noGroupsDialogOpen, setNoGroupsDialogOpen] = useState(false);
+  const [fetchedData, setFetchedData] = useState(false);
 
+  useEffect(() => {
+    if (!groups.length && !fetchedData) {
+      handleGetGroups();
+    }
+  });
+
+  const handleGetGroups = () => {
+    const { school } = user;
+    getAllSchoolGroups(school)
+      .then(resp => {
+        const listOfGroups = [];
+        if (resp.docs.length) {
+          resp.docs.forEach(item => {
+            listOfGroups.push(item.data());
+          });
+          setGroups(listOfGroups);
+        }
+        setFetchedData(true);
+      })
+      .catch(e => {
+        alert(e);
+        setFetchedData(true);
+      });
+  };
   const handleSortedByChange = ({ target }) => {
     setSortedBy(target.value);
   };
@@ -148,6 +174,11 @@ const GroupSelectionPage = () => {
     setNewGroupDialogOpen(false);
   };
 
+  const handleNewGroupCreated = () => {
+    handleGetGroups();
+    handleCloseNewGroupDialog();
+  };
+
   const handleCardClick = index => {
     const newGroup = Object.assign(groups[index], {
       isSelected: groups[index].isSelected ? false : true
@@ -162,8 +193,9 @@ const GroupSelectionPage = () => {
     >
       <NewGroupDialog
         handleDialogClose={handleCloseNewGroupDialog}
-        handleDialogSubmit={handleCloseNewGroupDialog}
+        handleDialogSubmit={handleNewGroupCreated}
         dialogOpen={newGroupDialogOpen}
+        school={user.school}
       />
       <GenericDialog
         dialogOpen={noGroupsDialogOpen}

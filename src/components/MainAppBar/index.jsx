@@ -43,6 +43,19 @@ const MainAppBar = ({ history, onChange, items, handleBlur, windowWidth }) => {
   const handleGoToLogin = () => {
     history.push("/login");
   };
+
+  const loadSearchBar = () => {
+    if (!window.location.href.includes("get-started")) {
+      return (
+        <SearchBar
+          onChange={onChange}
+          items={items}
+          handleBlur={handleBlur}
+          placeHolder="Search schools"
+        />
+      );
+    }
+  };
   return (
     <AppBar style={{ boxShadow: "0px 0px 0px 0px" }}>
       <Toolbar style={styles.toolbarContainer}>
@@ -65,12 +78,7 @@ const MainAppBar = ({ history, onChange, items, handleBlur, windowWidth }) => {
             >
               CheatFleet
             </Typography>
-            <SearchBar
-              onChange={onChange}
-              items={items}
-              handleBlur={handleBlur}
-              placeHolder="Search schools"
-            />
+            {loadSearchBar()}
             <div>
               <Button onClick={handleGoToLogin}>
                 <Typography style={styles.buttonText}>Login</Typography>

@@ -54,7 +54,15 @@ const styles = {
   }
 };
 
-const SearchBar = ({ placeHolder, classes, items, onChange, handleBlur }) => {
+const SearchBar = ({
+  placeHolder,
+  classes,
+  items,
+  onChange,
+  handleBlur,
+  onItemClick,
+  errorMessage
+}) => {
   const [textFieldFocused, setTextFieldFocused] = useState(false);
   const [mouseIn, setMouseIn] = useState(false);
   const [anchorEl, setAnchorEl] = useState(false);
@@ -72,6 +80,9 @@ const SearchBar = ({ placeHolder, classes, items, onChange, handleBlur }) => {
 
   const handleItemClick = (e, item) => {
     setSearchValue(item);
+    if (onItemClick) {
+      onItemClick(item);
+    }
     // e.stopPropagation()
   };
 
@@ -101,6 +112,8 @@ const SearchBar = ({ placeHolder, classes, items, onChange, handleBlur }) => {
         onBlur={handleTextFieldBlur}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
+        error={errorMessage}
+        helperText={errorMessage}
         value={searchValue}
         InputProps={{
           classes,

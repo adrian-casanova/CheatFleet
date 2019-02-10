@@ -7,24 +7,32 @@ const cache = {
 };
 export const createGroup = body =>
   new Promise((resolve, reject) => {
-    const { groupName, description, teacherName, subject, schoolName } = body;
-    console.log("body: ", body);
+    const {
+      name,
+      description,
+      teacherName,
+      subject,
+      school,
+      tags,
+      groupColor
+    } = body;
     const database = firebase.firestore();
     database.settings({
       timestampsInSnapshots: true
     });
     const groupId = uuidv1();
     database
-      .collection(schoolName)
-      .doc("groups")
-      .update({
-        [groupId]: {
-          groupName,
-          groupId,
-          description,
-          teacherName,
-          subject
-        }
+      .collection("Groups")
+      .doc(groupId)
+      .set({
+        name,
+        groupId,
+        description,
+        teacherName,
+        subject,
+        school,
+        tags,
+        groupColor
       })
       .then(resp => resolve(resp))
       .catch(e => reject(e));
@@ -65,21 +73,31 @@ export const addGroupsToUser = (uid, group) =>
       .catch(e => reject(e));
   });
 
-export const getAllGroups = (schoolName, reload) =>
+export const getAllSchoolGroups = school =>
   new Promise((resolve, reject) => {
-    if (!reload && cache.groups.length) {
-      resolve(cache.groups[0]);
-    }
+    const database = firebase.firestore();
+    database.settings({
+      timestampsInSnapshots: true
+    });
+    console.log("school: ", school);
+    database
+      .collection("Groups")
+      .where("school", "==", school)
+      .get()
+      .then(resp => resolve(resp))
+      .catch(e => reject(e));
+  });
+
+export const getAllGroups = () =>
+  new Promise((resolve, reject) => {
     const database = firebase.firestore();
     database.settings({
       timestampsInSnapshots: true
     });
     database
-      .collection(schoolName)
-      .doc("groups")
+      .collection("Groups")
       .get()
       .then(resp => {
-        cache.groups.push(resp);
         resolve(resp);
       })
       .catch(e => reject(e));

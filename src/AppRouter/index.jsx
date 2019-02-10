@@ -18,6 +18,7 @@ import { CircularProgress } from "@material-ui/core";
 import { schools } from "../datasets/colleges";
 import GroupSelectionPage from "../pages/GroupSelectionPage";
 import Footer from "../components/Footer";
+import GetStartedPage from "../pages/GetStartedPage";
 
 const AppRouter = ({ history }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -37,7 +38,11 @@ const AppRouter = ({ history }) => {
         handleGetUserObject(user);
       }
     });
-  });
+    return () => {
+      console.log("Cleaned up");
+      window.removeEventListener("resize", () => handleWindowResize());
+    };
+  }, []);
 
   const handleWindowResize = () => {
     setWindowWidth(window.innerWidth);
@@ -120,7 +125,9 @@ const AppRouter = ({ history }) => {
                 <Route
                   exact
                   path="/group-picker"
-                  render={props => <ChooseGroupsPage user={user} {...props} />}
+                  render={props => (
+                    <GroupSelectionPage user={user} {...props} />
+                  )}
                 />
                 <Route
                   exact
@@ -133,6 +140,11 @@ const AppRouter = ({ history }) => {
                   component={GroupHomePage}
                 />
                 <Route exact path="/file-viewer" component={FileViewer} />
+                <Route
+                  exact
+                  path="/get-started"
+                  render={props => <GetStartedPage user={user} />}
+                />
               </div>
             ) : (
               <div>

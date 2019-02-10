@@ -10,6 +10,7 @@ import {
 import { Panel as ColorPickerPanel } from "material-ui-rc-color-picker";
 import "material-ui-rc-color-picker/assets/index.css";
 import { primaryBlue } from "../../../../styles";
+import { createGroup } from "../../../../services/GroupService";
 
 const styles = {
   content: {
@@ -31,13 +32,41 @@ const styles = {
 const NewGroupDialog = ({
   dialogOpen,
   handleDialogClose,
-  handleDialogSubmit
+  handleDialogSubmit,
+  school
 }) => {
   const [colorPickerOpen, setColorPickerOpen] = useState(false);
   const [groupColor, setGroupColor] = useState("#fafafa");
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [tags, setTags] = useState("");
+  const [teacherName, setTeacherName] = useState("");
+  const [subject, setSubject] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleOpenColorPicker = () => {
     setColorPickerOpen(true);
+  };
+
+  const handleCreateGroup = () => {
+    if (!name || !subject || !teacherName || !tags || !description) {
+      setErrorMessage("All fields are required.");
+    } else {
+      setErrorMessage("");
+      createGroup({
+        name,
+        subject,
+        teacherName,
+        tags,
+        description,
+        groupColor,
+        school
+      })
+        .then(() => {
+          handleDialogSubmit();
+        })
+        .catch(e => alert(e));
+    }
   };
 
   const handleColorInputChange = color => {
@@ -46,6 +75,28 @@ const NewGroupDialog = ({
 
   const handleCloseColorPicker = () => {
     setColorPickerOpen(false);
+  };
+  const handleInputChange = ({ target }) => {
+    const { name, value } = target;
+    switch (name) {
+      case "name":
+        setName(value);
+        break;
+      case "description":
+        setDescription(value);
+        break;
+      case "teacherName":
+        setTeacherName(value);
+        break;
+      case "tags":
+        setTags(value);
+        break;
+      case "subject":
+        setSubject(value);
+        break;
+      default:
+        return null;
+    }
   };
   return (
     <Dialog PaperProps={{ style: styles.container }} open={dialogOpen}>
@@ -61,26 +112,41 @@ const NewGroupDialog = ({
       </DialogTitle>
       <DialogContent>
         <div style={styles.content}>
-          <TextField variant="outlined" label="Name" helperText="required *" />
+          <TextField
+            name="name"
+            onChange={handleInputChange}
+            variant="outlined"
+            label="Name"
+            error={errorMessage}
+          />
           <TextField
             variant="outlined"
+            name="description"
+            error={errorMessage}
+            onChange={handleInputChange}
             label="Description"
-            helperText="required *"
           />
           <TextField
             variant="outlined"
+            name="subject"
+            error={errorMessage}
+            onChange={handleInputChange}
             label="Subject"
-            helperText="(optional)"
           />
           <TextField
             variant="outlined"
+            name="teacherName"
+            onChange={handleInputChange}
+            error={errorMessage}
             label="Teacher Name"
-            helperText="required *"
           />
           <TextField
             variant="outlined"
+            name="tags"
+            onChange={handleInputChange}
             label="Tags"
-            helperText="(optional) Seperate by commas (,)"
+            error={errorMessage}
+            helperText={errorMessage}
           />
         </div>
         <div
@@ -115,7 +181,7 @@ const NewGroupDialog = ({
           Cancel
         </Button>
         <Button
-          onClick={handleDialogSubmit}
+          onClick={handleCreateGroup}
           style={{ color: "white" }}
           variant="raised"
           color="primary"

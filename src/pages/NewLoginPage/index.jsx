@@ -10,9 +10,12 @@ import {
 } from "@material-ui/core";
 import Footer from "../../components/Footer";
 import { primaryBlue } from "../../styles";
-import { loginUser } from "../../services/UserService";
+import { library } from "@fortawesome/fontawesome-svg-core";
+import { loginUser, signInWithGoogle } from "../../services/UserService";
 import { checkUserGroups } from "../../services/GroupService";
 import { getUsersSchool } from "../../services/SchoolService";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 
 const styles = {
   container: {
@@ -70,6 +73,8 @@ const styles = {
     paddingRight: 10
   }
 };
+
+library.add(faGoogle);
 
 const inputStyles = {
   root: {
@@ -129,6 +134,19 @@ const NewLoginPage = ({ classes, history }) => {
       })
       .catch(e => setErrorMessage(e));
   };
+
+  const handleGoogleClick = () => {
+    signInWithGoogle()
+      .then(resp => {
+        console.log("resp: ", resp);
+        if (!resp.additionalUserInfo.isNewUser) {
+          history.push("/");
+        } else {
+          history.push("/get-started");
+        }
+      })
+      .catch(e => console.log("e: ", e));
+  };
   return (
     <div style={styles.container}>
       <Zoom in>
@@ -173,6 +191,17 @@ const NewLoginPage = ({ classes, history }) => {
                     type="password"
                     placeholder="Password"
                   />
+                  <Button
+                    style={{
+                      backgroundColor: "white",
+                      borderRadius: 25,
+                      marginTop: 20
+                    }}
+                    variant="raised"
+                    onClick={handleGoogleClick}
+                  >
+                    <FontAwesomeIcon color={primaryBlue} icon={faGoogle} />
+                  </Button>
                   <Button
                     onClick={handleLogin}
                     style={{

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Typography,
   TextField,
@@ -8,8 +8,11 @@ import {
   Fade,
   Zoom
 } from "@material-ui/core";
-import Footer from "../../components/Footer";
+import { faGoogle } from "@fortawesome/free-brands-svg-icons";
+import { library } from "@fortawesome/fontawesome-svg-core";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { primaryBlue } from "../../styles";
+import { signInWithGoogle, createUser } from "../../services/UserService";
 
 const styles = {
   container: {
@@ -27,7 +30,7 @@ const styles = {
     paddingBottom: 50
   },
   signUpBox: {
-    height: 500,
+    height: 525,
     width: "55%",
     minWidth: 300,
     display: "flex",
@@ -68,6 +71,8 @@ const styles = {
   }
 };
 
+library.add(faGoogle);
+
 const inputStyles = {
   root: {
     backgroundColor: "#f9f9f9",
@@ -85,7 +90,61 @@ const inputStyles = {
   error: {},
   notchedOutline: {}
 };
-const RegisterPage = ({ classes }) => {
+const RegisterPage = ({ classes, history }) => {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [allEntriesError, setAllEntriesError] = useState("");
+
+  const handleInputChange = ({ target }) => {
+    const { name, value } = target;
+    switch (name) {
+      case "name":
+        setName(value);
+        break;
+      case "email":
+        setEmail(value);
+        break;
+      case "password":
+        setPassword(value);
+        break;
+      case "confirmPassword":
+        setConfirmPassword(value);
+        break;
+      default:
+        return;
+    }
+  };
+  const handleRegister = () => {
+    if (!password || !confirmPassword || !name || !email) {
+      setAllEntriesError("All Entries must be filled in.");
+    } else if (password !== confirmPassword) {
+      setPasswordError("Passwords do not match!");
+    } else {
+      setAllEntriesError("");
+      setPasswordError("");
+      createUser({ email, password, name })
+        .then(() => {
+          history.push("/get-started");
+        })
+        .catch(e => console.log("e: ", e));
+    }
+  };
+
+  const handleGoogleClick = () => {
+    signInWithGoogle()
+      .then(resp => {
+        console.log("resp: ", resp);
+        if (!resp.additionalUserInfo.isNewUser) {
+          history.push("/");
+        } else {
+          history.push("/get-started");
+        }
+      })
+      .catch(e => console.log("e: ", e));
+  };
   return (
     <div style={styles.container}>
       <Zoom in>
@@ -103,17 +162,13 @@ const RegisterPage = ({ classes }) => {
                 InputProps={{
                   classes
                 }}
-                style={{ width: "50%" }}
+                style={{ width: "100%" }}
                 variant="outlined"
-                placeholder="First Name"
-              />
-              <TextField
-                InputProps={{
-                  classes
-                }}
-                style={{ width: "50%" }}
-                variant="outlined"
-                placeholder="Last Name"
+                placeholder="Name"
+                value={name}
+                onChange={handleInputChange}
+                name="name"
+                error={allEntriesError && !name}
               />
               <TextField
                 InputProps={{
@@ -125,6 +180,10 @@ const RegisterPage = ({ classes }) => {
                 }}
                 variant="outlined"
                 placeholder="E-mail"
+                value={email}
+                onChange={handleInputChange}
+                name="email"
+                error={allEntriesError && !email}
               />
               <TextField
                 InputProps={{
@@ -137,6 +196,10 @@ const RegisterPage = ({ classes }) => {
                 variant="outlined"
                 type="password"
                 placeholder="Password"
+                value={password}
+                onChange={handleInputChange}
+                name="password"
+                error={passwordError || (allEntriesError && !password)}
               />
               <TextField
                 InputProps={{
@@ -149,7 +212,23 @@ const RegisterPage = ({ classes }) => {
                 variant="outlined"
                 type="password"
                 placeholder="Confirm Password"
+                value={confirmPassword}
+                onChange={handleInputChange}
+                name="confirmPassword"
+                error={passwordError || (allEntriesError && !confirmPassword)}
+                helperText={passwordError || allEntriesError}
               />
+              <Button
+                style={{
+                  backgroundColor: "white",
+                  borderRadius: 25,
+                  marginTop: 20
+                }}
+                variant="raised"
+                onClick={handleGoogleClick}
+              >
+                <FontAwesomeIcon color={primaryBlue} icon={faGoogle} />
+              </Button>
               <Button
                 style={{
                   width: "100%",
@@ -161,6 +240,7 @@ const RegisterPage = ({ classes }) => {
                   backgroundColor: primaryBlue,
                   color: "white"
                 }}
+                onClick={handleRegister}
               >
                 Register
               </Button>

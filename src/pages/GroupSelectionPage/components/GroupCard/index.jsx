@@ -77,17 +77,17 @@ const GroupCard = ({ classes, handleCardClick, index, item }) => {
           height: 75,
           width: "100%",
           padding: 5,
-          backgroundColor: item.headerColor,
+          backgroundColor: item.groupColor,
           display: "flex",
           alignItems: "flex-end"
         }}
       >
         <Typography style={styles.cardTitle} variant="title">
-          Card Title
+          {item.name}
         </Typography>
       </div>
       <Typography variant="body1" style={styles.cardBodyText}>
-        {item.value}
+        {item.description}
       </Typography>
     </Card>
   );
